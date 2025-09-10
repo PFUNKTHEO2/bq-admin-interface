@@ -1,36 +1,42 @@
+// File: backend/src/types/index.ts
+// Replace the entire contents of this file
+
 export interface Dataset {
   id: string;
   name: string;
   description: string;
-  created: Date;
   location: string;
-  [key: string]: any; // Allow additional properties
+  created: string;
+  lastModified: string;
 }
 
 export interface Table {
   id: string;
   name: string;
-  description: string;
-  created: Date;
+  type: string;
+  schema: any[];
   numRows: number;
   numBytes: number;
-  [key: string]: any; // Allow additional properties
-}
-
-export interface TableField {
-  name: string;
-  type: string;
-  mode: string;
-  description?: string;
-  [key: string]: any; // Allow additional properties
+  created: string;
+  lastModified: string;
+  description: string;
+  labels: any;
+  location: string;
 }
 
 export interface TableSchema {
-  fields: TableField[];
+  tableId: string;
+  schema: any[];
   description: string;
-  numRows: number;
-  numBytes: number;
-  created: Date;
-  modified: Date;
-  [key: string]: any; // Allow additional properties
+  numRows: string;
+  numBytes: string;
+  created: string;
+  lastModified: string;
+}
+
+export interface TableData {
+  tableId: string;
+  data: any[];
+  totalRows: number;
+  query: string;
 }
