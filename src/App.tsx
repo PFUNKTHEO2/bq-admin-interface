@@ -81,7 +81,7 @@ const TableDataComponent: React.FC = () => {
         setError(null);
         console.log('Fetching data for', datasetId, tableId);
         const response = await apiService.getTableData(datasetId, tableId);
-        setData(response);
+        setData(response.data || []); // FIXED: Extract data array from response
       } catch (err) {
         setError('Failed to load table data');
         console.error('Error fetching table data:', err);
