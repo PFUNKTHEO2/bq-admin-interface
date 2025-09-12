@@ -12,7 +12,7 @@ import {
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 interface LoginProps {
-  onLogin: (success: boolean) => void;
+  onLogin: (password: string) => boolean;
 }
 
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -27,11 +27,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     // Small delay to prevent brute force attempts
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    if (password === process.env.REACT_APP_ACCESS_PASSWORD) {
-      localStorage.setItem('bq_admin_authenticated', 'true');
-      localStorage.setItem('bq_admin_auth_time', Date.now().toString());
-      onLogin(true);
-    } else {
+    // Use the login function from useAuth hook
+    const success = onLogin(password);
+    
+    if (!success) {
       setError('Invalid password. Please try again.');
       setPassword(''); // Clear password field on error
     }
@@ -119,4 +118,4 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       </Box>
     </Container>
   );
-}; 
+};

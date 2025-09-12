@@ -1,21 +1,4 @@
-<<<<<<< HEAD
 // src/components/DatasetBrowser/DatasetBrowser.tsx
-import React from 'react';
-import { Typography, Box } from '@mui/material';
-
-export const DatasetBrowser: React.FC = () => {
-  return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Dataset Browser
-      </Typography>
-      <Typography variant="body1">
-        Browse your BigQuery datasets here
-      </Typography>
-    </Box>
-  );
-}; 
-=======
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -45,7 +28,7 @@ interface Table {
   modifiedTime: string;
 }
 
-const DatasetBrowser: React.FC = () => {
+export const DatasetBrowser: React.FC = () => {
   const { datasetId } = useParams<{ datasetId: string }>();
   const navigate = useNavigate();
   const [tables, setTables] = useState<Table[]>([]);
@@ -154,6 +137,3 @@ const DatasetBrowser: React.FC = () => {
     </Box>
   );
 };
-
-export default DatasetBrowser;
->>>>>>> f247f1d617cd6cb23e93e7b4f55589660002ab41

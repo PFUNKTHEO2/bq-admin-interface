@@ -1,21 +1,4 @@
-<<<<<<< HEAD
- // src/components/Dashboard/Dashboard.tsx
-import React from 'react';
-import { Typography, Box } from '@mui/material';
-
-export const Dashboard: React.FC = () => {
-  return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Dashboard
-      </Typography>
-      <Typography variant="body1">
-        Welcome to BigQuery Admin Dashboard
-      </Typography>
-    </Box>
-  );
-};
-=======
+// src/components/Dashboard/Dashboard.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -43,7 +26,7 @@ interface DatasetWithTables extends Dataset {
   tableCount?: number;
 }
 
-const Dashboard: React.FC = () => {
+export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [datasets, setDatasets] = useState<DatasetWithTables[]>([]);
   const [loading, setLoading] = useState(true);
@@ -296,6 +279,3 @@ const Dashboard: React.FC = () => {
     </Box>
   );
 };
-
-export default Dashboard;
->>>>>>> f247f1d617cd6cb23e93e7b4f55589660002ab41

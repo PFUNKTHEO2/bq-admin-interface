@@ -29,15 +29,27 @@ export const useAuth = () => {
     setIsLoading(false);
   };
 
-  const login = () => {
-    setIsAuthenticated(true);
+  const login = (password: string): boolean => {
+    const correctPassword = process.env.REACT_APP_ACCESS_PASSWORD;
+    
+    // Debug: Log to see if environment variable is loaded
+    console.log('Environment password loaded:', !!correctPassword);
+    
+    if (password === correctPassword) {
+      localStorage.setItem('bq_admin_authenticated', 'true');
+      localStorage.setItem('bq_admin_auth_time', Date.now().toString());
+      setIsAuthenticated(true);
+      return true;
+    }
+    
+    return false; // Password incorrect
   };
 
   const logout = () => {
-  localStorage.removeItem('bq_admin_authenticated');
-  localStorage.removeItem('bq_admin_auth_time');
-  setIsAuthenticated(false); // This line is crucial
-};
+    localStorage.removeItem('bq_admin_authenticated');
+    localStorage.removeItem('bq_admin_auth_time');
+    setIsAuthenticated(false);
+  };
 
   return {
     isAuthenticated,
