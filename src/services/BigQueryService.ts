@@ -135,35 +135,81 @@ class BigQueryService {
         return [];
       }
 
-      // Real BigQuery API calls
+      // Get basic table list with metadata
       console.log(`Fetching tables from BigQuery dataset: ${datasetId}`);
       const dataset = this.bigquery.dataset(datasetId);
       const [tables] = await dataset.getTables();
 
-      console.log(`Found ${tables.length} tables, fetching metadata...`);
+      console.log(`Found ${tables.length} tables/views, processing each type...`);
 
-      // Fetch metadata for each table
-      const tablesWithMetadata = await Promise.all(
+      // Process each table/view based on its type
+      const tablesWithInfo = await Promise.all(
         tables.map(async (table) => {
           try {
+            // Try to get basic metadata to determine type
             const [metadata] = await table.getMetadata();
+            const isView = metadata.type === 'VIEW';
             
-            return {
-              id: table.id!,
-              name: table.id!,
-              type: metadata.type || 'TABLE',
-              schema: metadata.schema?.fields || [],
-              numRows: parseInt(metadata.numRows || '0'),
-              numBytes: parseInt(metadata.numBytes || '0'),
-              createdTime: metadata.creationTime || '',
-              modifiedTime: metadata.lastModifiedTime || '',
-              description: metadata.description || '',
-              labels: metadata.labels || {},
-              location: metadata.location || 'US'
-            };
+            if (isView) {
+              // For VIEWs: Don't try to get row counts, just return basic info
+              console.log(`Processing VIEW: ${table.id}`);
+              return {
+                id: table.id!,
+                name: table.id!,
+                type: 'VIEW',
+                schema: metadata.schema?.fields || [],
+                numRows: 0, // Views don't have stored row counts
+                numBytes: 0, // Views don't have storage size
+                createdTime: metadata.creationTime || '',
+                modifiedTime: metadata.lastModifiedTime || '',
+                description: metadata.description || '',
+                labels: metadata.labels || {},
+                location: metadata.location || 'US'
+              };
+            } else {
+              // For TABLEs: Try to get row count via SQL
+              console.log(`Processing TABLE: ${table.id}`);
+              try {
+                const countQuery = `SELECT COUNT(*) as total FROM \`${this.projectId}.${datasetId}.${table.id}\` LIMIT 1000000`;
+                const [rows] = await this.bigquery!.query({ 
+                  query: countQuery,
+                  maxResults: 1
+                });
+                const rowCount = rows[0]?.total ? parseInt(rows[0].total.toString()) : 0;
+                
+                return {
+                  id: table.id!,
+                  name: table.id!,
+                  type: 'TABLE',
+                  schema: metadata.schema?.fields || [],
+                  numRows: rowCount, // Real count from SQL
+                  numBytes: parseInt(metadata.numBytes || '0') || (rowCount * 100), // Use metadata or estimate
+                  createdTime: metadata.creationTime || '',
+                  modifiedTime: metadata.lastModifiedTime || '',
+                  description: metadata.description || '',
+                  labels: metadata.labels || {},
+                  location: metadata.location || 'US'
+                };
+              } catch (countError) {
+                // If count query fails, use metadata values
+                return {
+                  id: table.id!,
+                  name: table.id!,
+                  type: 'TABLE',
+                  schema: metadata.schema?.fields || [],
+                  numRows: parseInt(metadata.numRows || '0'),
+                  numBytes: parseInt(metadata.numBytes || '0'),
+                  createdTime: metadata.creationTime || '',
+                  modifiedTime: metadata.lastModifiedTime || '',
+                  description: metadata.description || '',
+                  labels: metadata.labels || {},
+                  location: metadata.location || 'US'
+                };
+              }
+            }
           } catch (error) {
-            console.error(`Error fetching metadata for table ${table.id}:`, error);
-            // Return basic info if metadata fails
+            console.error(`Error processing ${table.id}:`, error);
+            // Fallback: assume it's a table with no data
             return {
               id: table.id!,
               name: table.id!,
@@ -181,8 +227,11 @@ class BigQueryService {
         })
       );
 
-      console.log(`Successfully fetched metadata for ${tablesWithMetadata.length} tables`);
-      return tablesWithMetadata;
+      const tableCount = tablesWithInfo.filter(t => t.type === 'TABLE').length;
+      const viewCount = tablesWithInfo.filter(t => t.type === 'VIEW').length;
+      
+      console.log(`Successfully processed ${tableCount} tables and ${viewCount} views`);
+      return tablesWithInfo;
 
     } catch (error) {
       console.error('Error in getTables:', error);
