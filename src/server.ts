@@ -18,8 +18,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Register routes - THIS IS CRITICAL
-app.use('/', datasetsRouter);
+// Register API routes ONLY under /api prefix
 app.use('/api', datasetsRouter);
 
 // Error handling middleware
@@ -39,4 +38,4 @@ app.listen(PORT, () => {
   console.log(`Health check available at http://localhost:${PORT}/health`);
 });
 
-export default app;"// Force redeploy" 
+export default app;
