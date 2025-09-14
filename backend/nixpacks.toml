@@ -1,0 +1,14 @@
+# Force Railway to use Node.js 
+providers = ["node"] 
+ 
+[variables] 
+    NODE_ENV = "production" 
+ 
+[phases.build] 
+    cmds = [ 
+        "npm install", 
+        "npm run build" 
+    ] 
+ 
+[start] 
+    cmd = "npm start" 

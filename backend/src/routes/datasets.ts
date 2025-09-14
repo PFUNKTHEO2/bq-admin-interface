@@ -1,58 +1,76 @@
-// File: backend/src/routes/datasets.ts
-// Replace the entire contents of this file
-
-import { Router } from 'express';
+import express from 'express';
 import BigQueryService from '../services/BigQueryService';
 
-const router = Router();
+const router = express.Router();
+const bigQueryService = new BigQueryService();
 
-// Get all datasets
-router.get('/', async (req, res) => {
+// GET /api/datasets - Get all datasets
+router.get('/datasets', async (req, res) => {
   try {
-    const datasets = await BigQueryService.getDatasets();
+    console.log('GET /api/datasets - Fetching all datasets');
+    console.log('Fetching datasets...');
+    const datasets = await bigQueryService.getDatasets();
+    console.log(`Found ${datasets.length} datasets`);
     res.json(datasets);
-  } catch (error) {
-    console.error('Error fetching datasets:', error);
+  } catch (error: any) {
+    console.error('Error fetching datasets:', error?.message);
     res.status(500).json({ error: 'Failed to fetch datasets' });
   }
 });
 
-// Get tables in a dataset
-router.get('/:datasetId/tables', async (req, res) => {
+// GET /api/datasets/:datasetId/tables - Get tables in dataset
+router.get('/datasets/:datasetId/tables', async (req, res) => {
   try {
     const { datasetId } = req.params;
-    const tables = await BigQueryService.getTables(datasetId);
+    console.log(`GET /api/datasets/${datasetId}/tables - Fetching tables`);
+    console.log(`Fetching tables for dataset: ${datasetId}`);
+    const tables = await bigQueryService.getTables(datasetId);
+    console.log(`Found ${tables.length} tables in ${datasetId}`);
     res.json(tables);
-  } catch (error) {
-    console.error('Error fetching tables:', error);
+  } catch (error: any) {
+    console.error('Error fetching tables:', error?.message);
     res.status(500).json({ error: 'Failed to fetch tables' });
   }
 });
 
-// Get table schema
-router.get('/:datasetId/tables/:tableId', async (req, res) => {
+// GET /api/datasets/:datasetId/tables/:tableId/data - Get table data with enhanced filtering
+router.get('/datasets/:datasetId/tables/:tableId/data', async (req, res) => {
   try {
     const { datasetId, tableId } = req.params;
-    const schema = await BigQueryService.getTableSchema(datasetId, tableId);
-    res.json(schema);
-  } catch (error) {
-    console.error('Error fetching table schema:', error);
-    res.status(500).json({ error: 'Failed to fetch table schema' });
-  }
-});
+    const { limit = 100, filters, sorts } = req.query;
 
-// Get table data
-router.get('/:datasetId/tables/:tableId/data', async (req, res) => {
-  try {
-    const { datasetId, tableId } = req.params;
-    const limit = parseInt(req.query.limit as string) || 100;
-    
-    const data = await BigQueryService.getTableData(datasetId, tableId, limit);
+    console.log(`GET /api/datasets/${datasetId}/tables/${tableId}/data - Fetching table data (limit: ${limit})`);
+    console.log(`Fetching data for table: ${datasetId}.${tableId} (limit: ${limit})`);
+
+    let options: any = { limit: parseInt(limit as string) };
+
+    // Parse filters if provided
+    if (filters) {
+      try {
+        options.filters = JSON.parse(filters as string);
+        console.log('Applied filters:', options.filters);
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid filters JSON' });
+      }
+    }
+
+    // Parse sorts if provided  
+    if (sorts) {
+      try {
+        options.sorts = JSON.parse(sorts as string);
+        console.log('Applied sorts:', options.sorts);
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid sorts JSON' });
+      }
+    }
+
+    const data = await bigQueryService.getTableData(datasetId, tableId, options);
+    console.log(`Retrieved ${data.data?.length || 0} rows from ${datasetId}.${tableId}`);
     res.json(data);
-  } catch (error) {
-    console.error('Error fetching table data:', error);
+  } catch (error: any) {
+    console.error('Error fetching table data:', error?.message);
     res.status(500).json({ error: 'Failed to fetch table data' });
   }
 });
 
-export default router;
+export default router;  // ✅ CORRECT - exports router
