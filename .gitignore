@@ -1,4 +1,7 @@
-service-account-key.json 
-*.json 
-node_modules/ 
-dist/ 
+service-account-key.json
+google-service-account.json
+credentials.json
+node_modules/
+dist/
+.env.local
+.env.production 
