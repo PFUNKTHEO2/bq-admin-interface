@@ -114,25 +114,179 @@ class BigQueryService {
   async getTables(datasetId: string): Promise<Table[]> {
     try {
       if (!this.bigquery) {
-        // Fallback hardcoded data
-        if (datasetId === 'hockey') {
-          return [
-            {
-              id: 'players',
-              name: 'players',
-              type: 'TABLE',
-              schema: [],
-              numRows: 15420,
-              numBytes: 2847392,
-              createdTime: '2023-01-01T00:00:00Z',
-              modifiedTime: '2024-01-01T00:00:00Z',
-              description: 'Hockey players data',
-              labels: {},
-              location: 'US'
-            }
-          ];
+        // Enhanced sample data for all datasets
+        switch (datasetId) {
+          case 'hockey':
+            return [
+              {
+                id: 'players',
+                name: 'players',
+                type: 'TABLE',
+                schema: [],
+                numRows: 15420,
+                numBytes: 2847392,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-01T00:00:00Z',
+                description: 'Hockey players statistics and demographics',
+                labels: {},
+                location: 'US'
+              },
+              {
+                id: 'teams',
+                name: 'teams',
+                type: 'TABLE',
+                schema: [],
+                numRows: 32,
+                numBytes: 12800,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-01T00:00:00Z',
+                description: 'NHL team information and statistics',
+                labels: {},
+                location: 'US'
+              },
+              {
+                id: 'games',
+                name: 'games',
+                type: 'TABLE',
+                schema: [],
+                numRows: 82156,
+                numBytes: 15678234,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-01T00:00:00Z',
+                description: 'Game results and statistics',
+                labels: {},
+                location: 'US'
+              },
+              {
+                id: 'algorithms_v43',
+                name: 'algorithms_v43',
+                type: 'VIEW',
+                schema: [],
+                numRows: 0,
+                numBytes: 0,
+                createdTime: '2024-01-01T00:00:00Z',
+                modifiedTime: '2024-01-01T00:00:00Z',
+                description: 'Latest hockey analytics algorithms',
+                labels: {},
+                location: 'US'
+              }
+            ];
+          
+          case 'crm':
+            return [
+              {
+                id: 'customers',
+                name: 'customers',
+                type: 'TABLE',
+                schema: [],
+                numRows: 25678,
+                numBytes: 3456789,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-15T00:00:00Z',
+                description: 'Customer contact information and demographics',
+                labels: {},
+                location: 'US'
+              },
+              {
+                id: 'orders',
+                name: 'orders',
+                type: 'TABLE',
+                schema: [],
+                numRows: 156742,
+                numBytes: 12456789,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-15T00:00:00Z',
+                description: 'Customer orders and transaction history',
+                labels: {},
+                location: 'US'
+              },
+              {
+                id: 'support_tickets',
+                name: 'support_tickets',
+                type: 'TABLE',
+                schema: [],
+                numRows: 8934,
+                numBytes: 1234567,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-15T00:00:00Z',
+                description: 'Customer support tickets and resolutions',
+                labels: {},
+                location: 'US'
+              },
+              {
+                id: 'customer_analytics',
+                name: 'customer_analytics',
+                type: 'VIEW',
+                schema: [],
+                numRows: 0,
+                numBytes: 0,
+                createdTime: '2024-01-01T00:00:00Z',
+                modifiedTime: '2024-01-15T00:00:00Z',
+                description: 'Customer behavior and lifetime value analytics',
+                labels: {},
+                location: 'US'
+              }
+            ];
+          
+          case 'tournament_consolidation':
+            return [
+              {
+                id: 'tournaments',
+                name: 'tournaments',
+                type: 'TABLE',
+                schema: [],
+                numRows: 1247,
+                numBytes: 567891,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-10T00:00:00Z',
+                description: 'Tournament information and metadata',
+                labels: {},
+                location: 'US'
+              },
+              {
+                id: 'participants',
+                name: 'participants',
+                type: 'TABLE',
+                schema: [],
+                numRows: 34567,
+                numBytes: 4567890,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-10T00:00:00Z',
+                description: 'Tournament participants and registrations',
+                labels: {},
+                location: 'US'
+              },
+              {
+                id: 'matches',
+                name: 'matches',
+                type: 'TABLE',
+                schema: [],
+                numRows: 78901,
+                numBytes: 8901234,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-10T00:00:00Z',
+                description: 'Match results and game statistics',
+                labels: {},
+                location: 'US'
+              },
+              {
+                id: 'standings',
+                name: 'standings',
+                type: 'TABLE',
+                schema: [],
+                numRows: 2456,
+                numBytes: 345678,
+                createdTime: '2023-01-01T00:00:00Z',
+                modifiedTime: '2024-01-10T00:00:00Z',
+                description: 'Tournament standings and rankings',
+                labels: {},
+                location: 'US'
+              }
+            ];
+          
+          default:
+            return [];
         }
-        return [];
       }
 
       // Get basic table list with metadata
@@ -327,18 +481,82 @@ class BigQueryService {
   }
 
   private getSampleTableData(datasetId: string, tableId: string, limit: number, offset = 0, filters: FilterCondition[] = [], sorts: SortCondition[] = []) {
-    // Sample data fallback
-    const sampleRows = [
-      { id: 1, name: 'Sample Player 1', position: 'Forward', nationality: 'USA' },
-      { id: 2, name: 'Sample Player 2', position: 'Defense', nationality: 'CAN' },
-      { id: 3, name: 'Sample Player 3', position: 'Goalie', nationality: 'SWE' },
-    ].slice(offset, offset + limit);
+    // Enhanced sample data based on dataset and table
+    let sampleRows: any[] = [];
+    
+    if (datasetId === 'hockey') {
+      switch (tableId) {
+        case 'players':
+          sampleRows = [
+            { id: 1, name: 'Connor McDavid', position: 'C', team: 'EDM', nationality: 'CAN', goals: 64, assists: 89 },
+            { id: 2, name: 'Leon Draisaitl', position: 'C', team: 'EDM', nationality: 'GER', goals: 52, assists: 76 },
+            { id: 3, name: 'David Pastrnak', position: 'RW', team: 'BOS', nationality: 'CZE', goals: 61, assists: 52 }
+          ];
+          break;
+        case 'teams':
+          sampleRows = [
+            { id: 1, name: 'Edmonton Oilers', city: 'Edmonton', conference: 'Western', division: 'Pacific' },
+            { id: 2, name: 'Boston Bruins', city: 'Boston', conference: 'Eastern', division: 'Atlantic' },
+            { id: 3, name: 'Toronto Maple Leafs', city: 'Toronto', conference: 'Eastern', division: 'Atlantic' }
+          ];
+          break;
+        default:
+          sampleRows = [
+            { id: 1, name: 'Sample Data 1', value: 100 },
+            { id: 2, name: 'Sample Data 2', value: 200 }
+          ];
+      }
+    } else if (datasetId === 'crm') {
+      switch (tableId) {
+        case 'customers':
+          sampleRows = [
+            { id: 1, first_name: 'John', last_name: 'Smith', email: 'john.smith@email.com', signup_date: '2023-01-15' },
+            { id: 2, first_name: 'Sarah', last_name: 'Johnson', email: 'sarah.j@email.com', signup_date: '2023-02-20' },
+            { id: 3, first_name: 'Mike', last_name: 'Brown', email: 'mike.brown@email.com', signup_date: '2023-03-10' }
+          ];
+          break;
+        case 'orders':
+          sampleRows = [
+            { id: 1, customer_id: 1, order_date: '2024-01-10', amount: 149.99, status: 'Delivered' },
+            { id: 2, customer_id: 2, order_date: '2024-01-12', amount: 89.50, status: 'Shipped' },
+            { id: 3, customer_id: 1, order_date: '2024-01-15', amount: 299.99, status: 'Processing' }
+          ];
+          break;
+        default:
+          sampleRows = [
+            { id: 1, description: 'CRM Sample Data', value: 'Sample' }
+          ];
+      }
+    } else if (datasetId === 'tournament_consolidation') {
+      switch (tableId) {
+        case 'tournaments':
+          sampleRows = [
+            { id: 1, name: 'Winter Championship 2024', start_date: '2024-01-15', end_date: '2024-01-25', status: 'Completed' },
+            { id: 2, name: 'Spring Tournament', start_date: '2024-04-01', end_date: '2024-04-10', status: 'Upcoming' },
+            { id: 3, name: 'Summer League', start_date: '2024-06-15', end_date: '2024-08-30', status: 'In Progress' }
+          ];
+          break;
+        case 'participants':
+          sampleRows = [
+            { id: 1, tournament_id: 1, team_name: 'Lightning Bolts', captain: 'Alex Martinez', registration_date: '2023-12-01' },
+            { id: 2, tournament_id: 1, team_name: 'Fire Dragons', captain: 'Emma Wilson', registration_date: '2023-12-03' },
+            { id: 3, tournament_id: 2, team_name: 'Ice Hawks', captain: 'Ryan Thompson', registration_date: '2024-03-15' }
+          ];
+          break;
+        default:
+          sampleRows = [
+            { id: 1, description: 'Tournament Sample Data', value: 'Sample' }
+          ];
+      }
+    }
 
+    const result = sampleRows.slice(offset, offset + limit);
+    
     return {
       tableId,
-      data: sampleRows,
-      totalRows: sampleRows.length,
-      totalCount: 3,
+      data: result,
+      totalRows: result.length,
+      totalCount: sampleRows.length,
       query: `Sample data for ${datasetId}.${tableId}`
     };
   }
@@ -346,11 +564,26 @@ class BigQueryService {
   async getTableSchema(datasetId: string, tableId: string) {
     try {
       if (!this.bigquery) {
+        // Return sample schema based on dataset/table
+        if (datasetId === 'hockey' && tableId === 'players') {
+          return {
+            fields: [
+              { name: 'id', type: 'INTEGER', mode: 'REQUIRED' },
+              { name: 'name', type: 'STRING', mode: 'NULLABLE' },
+              { name: 'position', type: 'STRING', mode: 'NULLABLE' },
+              { name: 'team', type: 'STRING', mode: 'NULLABLE' },
+              { name: 'nationality', type: 'STRING', mode: 'NULLABLE' },
+              { name: 'goals', type: 'INTEGER', mode: 'NULLABLE' },
+              { name: 'assists', type: 'INTEGER', mode: 'NULLABLE' }
+            ]
+          };
+        }
+        
         return {
           fields: [
             { name: 'id', type: 'INTEGER', mode: 'REQUIRED' },
             { name: 'name', type: 'STRING', mode: 'NULLABLE' },
-            { name: 'position', type: 'STRING', mode: 'NULLABLE' },
+            { name: 'value', type: 'STRING', mode: 'NULLABLE' },
           ]
         };
       }
