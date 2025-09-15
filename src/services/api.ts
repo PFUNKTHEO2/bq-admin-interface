@@ -20,17 +20,22 @@ export interface Table {
   modifiedTime: string;
 }
 
+// FORCE CORRECT URL - NO ENVIRONMENT VARIABLE OVERRIDE
+const RAILWAY_API_URL = 'https://bq-admin-interface-production.up.railway.app';
+
 class ApiService {
   private baseURL: string;
 
   constructor() {
-    // Hardcoded correct Railway URL to bypass environment variable override
-    this.baseURL = 'https://bq-admin-interface-production.up.railway.app';
+    // Force hardcoded Railway URL - ignore ALL environment variables
+    this.baseURL = RAILWAY_API_URL;
+    console.log('API Service initialized with URL:', this.baseURL);
   }
 
   // Existing methods - GET operations
   async getDatasets(): Promise<Dataset[]> {
     try {
+      console.log('Fetching datasets from:', `${this.baseURL}/api/datasets`);
       const response = await fetch(`${this.baseURL}/api/datasets`);
       if (!response.ok) {
         throw new Error('Failed to fetch datasets');
@@ -84,6 +89,7 @@ class ApiService {
 
   async checkHealth() {
     try {
+      console.log('Health check URL:', `${this.baseURL}/health`);
       const response = await fetch(`${this.baseURL}/health`);
       return response.ok;
     } catch (error) {
