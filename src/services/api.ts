@@ -24,8 +24,8 @@ class ApiService {
   private baseURL: string;
 
   constructor() {
-    // Updated to use Railway backend URL as default
-    this.baseURL = process.env.REACT_APP_API_URL || 'https://bigquery-admin-backend-production.up.railway.app';
+    // Updated to use correct Railway backend URL
+    this.baseURL = process.env.REACT_APP_API_URL || 'https://bq-admin-interface-production.up.railway.app';
   }
 
   // Existing methods - GET operations
