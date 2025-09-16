@@ -72,6 +72,11 @@ router.get('/datasets/:datasetId/tables/:tableId', async (req, res) => {
     const tables = await bigQueryService.getTables(datasetId);
     const tableInfo = tables.find(t => t.name === tableId);
     
+    // Fix TypeScript errors by properly typing the field parameter
+    const editableColumns = schema.fields
+      ?.filter((field: any) => field.name !== 'id' && !field.name.includes('created_at') && !field.name.includes('updated_at'))
+      .map((field: any) => field.name) || [];
+    
     const response = {
       tableId,
       name: tableId,
@@ -83,9 +88,7 @@ router.get('/datasets/:datasetId/tables/:tableId', async (req, res) => {
       lastModifiedTime: tableInfo?.modifiedTime || '',
       description: tableInfo?.description || '',
       primaryKey: ['id'], // Could be determined from schema
-      editableColumns: schema.fields
-        ?.filter(field => field.name !== 'id' && !field.name.includes('created_at') && !field.name.includes('updated_at'))
-        .map(field => field.name) || []
+      editableColumns: editableColumns
     };
     
     console.log(`Retrieved schema for ${datasetId}.${tableId} with ${response.schema.length} fields`);
@@ -267,7 +270,7 @@ router.put('/datasets/:datasetId/tables/:tableId/bulk', async (req, res) => {
         success: true,
         totalOperations: operations.length,
         validationResults,
-        allValid: validationResults.every(r => r.valid),
+        allValid: validationResults.every((r: any) => r.valid),
         message: 'Bulk operations validation completed'
       });
       return;
@@ -287,8 +290,8 @@ router.put('/datasets/:datasetId/tables/:tableId/bulk', async (req, res) => {
     const response = {
       success: true,
       totalOperations: operations.length,
-      successful: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
+      successful: results.filter((r: any) => r.success).length,
+      failed: results.filter((r: any) => !r.success).length,
       results,
       message: 'Bulk operations completed successfully'
     };
