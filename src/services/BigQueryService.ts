@@ -171,10 +171,13 @@ class BigQueryService {
               console.log(`Processing TABLE: ${table.id}`);
               try {
                 const countQuery = `SELECT COUNT(*) as total FROM \`${this.projectId}.${datasetId}.${table.id}\` LIMIT 1000000`;
-                const [rows] = await this.bigquery!.query({ 
+                // ✅ FIXED: Proper query result handling
+                const [job] = await this.bigquery!.createQueryJob({ 
                   query: countQuery,
-                  maxResults: 1
+                  maxResults: 1,
+                  jobTimeoutMs: 30000 // ✅ FIXED: Use jobTimeoutMs instead of timeoutMs
                 });
+                const [rows] = await job.getQueryResults();
                 const rowCount = rows[0]?.total ? parseInt(rows[0].total.toString()) : 0;
                 
                 return {
@@ -248,7 +251,12 @@ class BigQueryService {
           return this.getSampleTableData(datasetId, tableId, limit);
         }
         const query = `SELECT * FROM \`${process.env.GOOGLE_CLOUD_PROJECT_ID}.${datasetId}.${tableId}\` LIMIT ${limit}`;
-        const [rows] = await this.bigquery.query({ query });
+        // ✅ FIXED: Proper query result handling
+        const [job] = await this.bigquery.createQueryJob({ 
+          query,
+          jobTimeoutMs: 60000 // ✅ FIXED: Use jobTimeoutMs instead of timeoutMs
+        });
+        const [rows] = await job.getQueryResults();
         return {
           tableId,
           data: rows,
@@ -310,7 +318,12 @@ class BigQueryService {
       const query = `SELECT * FROM \`${process.env.GOOGLE_CLOUD_PROJECT_ID}.${datasetId}.${tableId}\`${whereClause}${orderByClause} LIMIT ${limit}`;
       console.log('Executing query:', query);
 
-      const [rows] = await this.bigquery.query({ query });
+      // ✅ FIXED: Proper query result handling
+      const [job] = await this.bigquery.createQueryJob({ 
+        query,
+        jobTimeoutMs: 60000 // ✅ FIXED: Use jobTimeoutMs instead of timeoutMs
+      });
+      const [rows] = await job.getQueryResults();
       
       return {
         tableId,
